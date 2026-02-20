@@ -49,7 +49,7 @@ composer update twisted-binary/laravel-feedback-widget
 ```json
 {
     "dependencies": {
-        "@twisted-binary/feedback-widget": "github:twisted-binary/laravel-feedback-widget"
+        "@twisted-binary/feedback-widget": "github:twisted-binary/laravel-feedback-widget#semver:^1.0"
     }
 }
 ```
