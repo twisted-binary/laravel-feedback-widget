@@ -8,7 +8,7 @@ use TwistedBinary\FeedbackWidget\Data\FeedbackChatResult;
 use TwistedBinary\FeedbackWidget\Services\FeedbackChatService;
 
 beforeEach(function (): void {
-    $this->service = new FeedbackChatService(model: 'gpt-4o-mini', appName: 'TestApp');
+    $this->service = new FeedbackChatService(model: 'gpt-4o-mini', appName: 'TestApp', locale: 'en');
 });
 
 it('returns a non-complete result for normal replies', function (): void {
@@ -148,3 +148,30 @@ it('provides a default reply when sentinel is found but visible text is empty', 
         ->reply->toBe('Thank you! Creating your issue now...')
         ->structuredData->not->toBeNull();
 });
+
+it('does not prepend locale instruction for English locale', function (): void {
+    $service = new FeedbackChatService(model: 'gpt-4o-mini', appName: 'TestApp', locale: 'en');
+    $method = new ReflectionMethod($service, 'buildSystemPrompt');
+
+    $prompt = $method->invoke($service, 'bug');
+
+    expect($prompt)->not->toContain('You must respond in');
+});
+
+it('prepends locale instruction for non-English locale', function (): void {
+    $service = new FeedbackChatService(model: 'gpt-4o-mini', appName: 'TestApp', locale: 'fr');
+    $method = new ReflectionMethod($service, 'buildSystemPrompt');
+
+    $prompt = $method->invoke($service, 'bug');
+
+    expect($prompt)->toStartWith('You must respond in fr.');
+});
+
+it('prepends locale instruction for all prompt types', function (string $type): void {
+    $service = new FeedbackChatService(model: 'gpt-4o-mini', appName: 'TestApp', locale: 'es');
+    $method = new ReflectionMethod($service, 'buildSystemPrompt');
+
+    $prompt = $method->invoke($service, $type);
+
+    expect($prompt)->toStartWith('You must respond in es.');
+})->with(['bug', 'feature', 'feedback']);

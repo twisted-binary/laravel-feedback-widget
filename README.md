@@ -146,6 +146,7 @@ GITHUB_FEEDBACK_LABEL=user-feedback   # optional
 # Widget
 FEEDBACK_WIDGET_APP_NAME=MyApp        # optional, used in AI prompts
 FEEDBACK_WIDGET_ROUTE_PREFIX=feedback  # optional
+FEEDBACK_WIDGET_LOCALE=en             # optional, defaults to app()->getLocale()
 ```
 
 ## Usage
@@ -192,8 +193,42 @@ return [
     'screenshot_disk' => 'public',
     'screenshot_path' => 'feedback-screenshots',
     'app_name' => env('FEEDBACK_WIDGET_APP_NAME', env('APP_NAME', 'the application')),
+    'locale' => env('FEEDBACK_WIDGET_LOCALE', null), // null = app()->getLocale()
 ];
 ```
+
+## Multilanguage Support
+
+### AI Response Language (`locale`)
+
+Set `FEEDBACK_WIDGET_LOCALE` in your `.env` to control the language the AI responds in. When not set, it falls back to `app()->getLocale()`. For English (`en`), no extra instruction is prepended to the AI prompt.
+
+### UI Translations (`translations` prop)
+
+All UI strings have English defaults. To translate the widget, pass a `translations` prop with your overrides:
+
+```vue
+<script setup>
+import { FeedbackWidget } from '@twisted-binary/feedback-widget';
+import type { FeedbackTranslations } from '@twisted-binary/feedback-widget';
+
+const translations: Partial<FeedbackTranslations> = {
+    header: 'Envoyer un commentaire',
+    bugLabel: 'Bug',
+    featureLabel: 'Fonctionnalité',
+    feedbackLabel: 'Avis',
+    inputPlaceholder: 'Tapez votre message...',
+    successMessage: 'Merci pour votre retour !',
+    // ... override only the strings you need
+};
+</script>
+
+<template>
+    <FeedbackWidget :translations="translations" />
+</template>
+```
+
+You only need to pass the strings you want to override — all others fall back to the English defaults. See the `FeedbackTranslations` interface for the full list of translatable strings.
 
 ## Exports
 
@@ -201,6 +236,8 @@ The npm package exports:
 
 ```ts
 import { FeedbackWidget, FeedbackChatPanel, useFeedbackChat } from '@twisted-binary/feedback-widget';
+import { defaultTranslations } from '@twisted-binary/feedback-widget';
+import type { FeedbackTranslations } from '@twisted-binary/feedback-widget';
 ```
 
 | Export | Description |
@@ -208,6 +245,8 @@ import { FeedbackWidget, FeedbackChatPanel, useFeedbackChat } from '@twisted-bin
 | `FeedbackWidget` | Full widget with FAB button + chat panel (drop into layout) |
 | `FeedbackChatPanel` | Chat panel only (if you want a custom trigger) |
 | `useFeedbackChat` | Composable with all state and methods |
+| `defaultTranslations` | Default English translations object |
+| `FeedbackTranslations` | TypeScript interface for all translatable strings |
 
 ## How It Works
 

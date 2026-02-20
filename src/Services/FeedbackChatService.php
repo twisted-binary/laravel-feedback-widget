@@ -17,6 +17,7 @@ final readonly class FeedbackChatService implements FeedbackChatServiceInterface
     public function __construct(
         private string $model,
         private string $appName,
+        private string $locale = 'en',
     ) {}
 
     /**
@@ -102,11 +103,17 @@ final readonly class FeedbackChatService implements FeedbackChatServiceInterface
 
     private function buildSystemPrompt(string $type): string
     {
-        return match ($type) {
+        $prompt = match ($type) {
             'bug' => $this->bugPrompt(),
             'feedback' => $this->feedbackPrompt(),
             default => $this->featurePrompt(),
         };
+
+        if ($this->locale !== 'en') {
+            $prompt = "You must respond in {$this->locale}.\n\n".$prompt;
+        }
+
+        return $prompt;
     }
 
     private function bugPrompt(): string

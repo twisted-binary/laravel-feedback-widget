@@ -2,8 +2,13 @@
 import { MessageSquarePlus } from 'lucide-vue-next';
 import FeedbackChatPanel from './FeedbackChatPanel.vue';
 import { useFeedbackChat } from '../composables/useFeedbackChat';
+import type { FeedbackTranslations } from '../translations';
 
-const { isOpen } = useFeedbackChat();
+const props = defineProps<{
+    translations?: Partial<FeedbackTranslations>;
+}>();
+
+const { isOpen, translations } = useFeedbackChat({ translations: props.translations });
 </script>
 
 <template>
@@ -26,7 +31,7 @@ const { isOpen } = useFeedbackChat();
             <!-- FAB button -->
             <button
                 class="bg-primary text-primary-foreground hover:bg-primary/90 flex h-12 w-12 items-center justify-center rounded-full shadow-lg transition-transform hover:scale-105 focus:ring-2 focus:ring-offset-2 focus:outline-none"
-                :aria-label="isOpen ? 'Close feedback' : 'Send feedback'"
+                :aria-label="isOpen ? translations.closeFeedback : translations.sendFeedback"
                 @click="isOpen = !isOpen"
             >
                 <MessageSquarePlus class="h-5 w-5" />

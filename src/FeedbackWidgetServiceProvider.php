@@ -23,6 +23,7 @@ final class FeedbackWidgetServiceProvider extends ServiceProvider
         $this->app->bind(FeedbackChatServiceInterface::class, fn (): FeedbackChatService => new FeedbackChatService(
             model: config('feedback-widget.openai_model'),
             appName: config('feedback-widget.app_name'),
+            locale: config('feedback-widget.locale') ?? app()->getLocale(),
         ));
 
         $this->app->bind(IssueServiceInterface::class, GitHubIssueService::class);

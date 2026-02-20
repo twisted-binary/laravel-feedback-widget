@@ -1,5 +1,6 @@
 import { usePage } from '@inertiajs/vue3';
 import { type Ref, ref } from 'vue';
+import { type FeedbackTranslations, defaultTranslations } from '../translations';
 
 export interface ChatMessage {
     role: 'user' | 'assistant';
@@ -42,13 +43,18 @@ const structuredData = ref<{ title: string; body: string } | null>(null);
 const screenshot: Ref<File | null> = ref(null);
 const isOpen = ref(false);
 const feedbackType = ref<'bug' | 'feature' | 'feedback'>('bug');
+const translations = ref<FeedbackTranslations>({ ...defaultTranslations });
 
 function getRoutes(): { chat: string; issue: string } {
     const page = usePage<FeedbackWidgetProps>();
     return page.props.feedbackWidget.routes;
 }
 
-export function useFeedbackChat() {
+export function useFeedbackChat(options?: { translations?: Partial<FeedbackTranslations> }) {
+    if (options?.translations) {
+        translations.value = { ...defaultTranslations, ...options.translations };
+    }
+
     async function sendMessage(message: string, type: string): Promise<void> {
         error.value = null;
 
@@ -75,21 +81,21 @@ export function useFeedbackChat() {
             });
 
             if (response.status === 419) {
-                error.value = 'Session expired. Please refresh the page.';
+                error.value = translations.value.sessionExpired;
                 messages.value.pop();
                 return;
             }
 
             if (response.status === 422) {
                 const data = await response.json();
-                error.value = data.message || 'Validation error. Please check your input.';
+                error.value = data.message || translations.value.validationError;
                 messages.value.pop();
                 return;
             }
 
             if (!response.ok) {
                 const data = await response.json();
-                error.value = data.error || 'Something went wrong. Please try again.';
+                error.value = data.error || translations.value.genericError;
                 messages.value.pop();
                 return;
             }
@@ -103,7 +109,7 @@ export function useFeedbackChat() {
                 structuredData.value = data.structured;
             }
         } catch {
-            error.value = 'Network error. Please check your connection.';
+            error.value = translations.value.networkError;
             messages.value.pop();
         } finally {
             isLoading.value = false;
@@ -152,13 +158,13 @@ export function useFeedbackChat() {
             });
 
             if (response.status === 419) {
-                error.value = 'Session expired. Please refresh the page.';
+                error.value = translations.value.sessionExpired;
                 return;
             }
 
             if (!response.ok) {
                 const data = await response.json();
-                error.value = data.error || 'Failed to create issue. Please try again.';
+                error.value = data.error || translations.value.issueCreationError;
                 return;
             }
 
@@ -167,7 +173,7 @@ export function useFeedbackChat() {
             issueUrl.value = data.url;
             issueNumber.value = data.number;
         } catch {
-            error.value = 'Network error. Please check your connection.';
+            error.value = translations.value.networkError;
         } finally {
             isLoading.value = false;
         }
@@ -196,6 +202,7 @@ export function useFeedbackChat() {
         screenshot,
         isOpen,
         feedbackType,
+        translations,
         sendMessage,
         createIssue,
         reset,

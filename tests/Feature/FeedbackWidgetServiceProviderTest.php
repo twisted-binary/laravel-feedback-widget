@@ -61,7 +61,27 @@ it('merges default config values', function (): void {
         ->and(config('feedback-widget.throttle.chat'))->toBe('30,1')
         ->and(config('feedback-widget.throttle.issue'))->toBe('5,1')
         ->and(config('feedback-widget.screenshot_disk'))->toBe('public')
-        ->and(config('feedback-widget.screenshot_path'))->toBe('feedback-screenshots');
+        ->and(config('feedback-widget.screenshot_path'))->toBe('feedback-screenshots')
+        ->and(config('feedback-widget.locale'))->toBeNull();
+});
+
+it('passes app locale to FeedbackChatService when locale config is null', function (): void {
+    config()->set('feedback-widget.locale', null);
+    app()->setLocale('fr');
+
+    $service = app(FeedbackChatServiceInterface::class);
+    $prop = new ReflectionProperty($service, 'locale');
+
+    expect($prop->getValue($service))->toBe('fr');
+});
+
+it('passes configured locale to FeedbackChatService', function (): void {
+    config()->set('feedback-widget.locale', 'de');
+
+    $service = app(FeedbackChatServiceInterface::class);
+    $prop = new ReflectionProperty($service, 'locale');
+
+    expect($prop->getValue($service))->toBe('de');
 });
 
 it('shares Inertia props with feedback widget routes', function (): void {

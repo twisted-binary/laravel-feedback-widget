@@ -7,11 +7,26 @@ const emit = defineEmits<{
     close: [];
 }>();
 
-const { messages, isLoading, isComplete, issueUrl, error, screenshot, feedbackType, sendMessage, createIssue, reset } =
-    useFeedbackChat();
+const {
+    messages,
+    isLoading,
+    isComplete,
+    issueUrl,
+    error,
+    screenshot,
+    feedbackType,
+    translations,
+    sendMessage,
+    createIssue,
+    reset,
+} = useFeedbackChat();
 
 const feedbackNoun = computed(() => {
-    return { bug: 'issue', feature: 'idea', feedback: 'feedback' }[feedbackType.value];
+    return {
+        bug: translations.value.bugNoun,
+        feature: translations.value.featureNoun,
+        feedback: translations.value.feedbackNoun,
+    }[feedbackType.value];
 });
 const inputMessage = ref('');
 const messagesContainer = ref<HTMLElement | null>(null);
@@ -25,6 +40,19 @@ const showStarRating = computed(() => isFeedbackType.value && messages.value.len
 const fileInput = ref<HTMLInputElement | null>(null);
 const textareaRef = ref<HTMLTextAreaElement | null>(null);
 const screenshotPreview = ref<string | null>(null);
+
+const typeOptions = computed(() => [
+    { value: 'bug' as const, label: translations.value.bugLabel, icon: '\uD83D\uDC1B' },
+    { value: 'feature' as const, label: translations.value.featureLabel, icon: '\u2728' },
+    { value: 'feedback' as const, label: translations.value.feedbackLabel, icon: '\uD83D\uDCAC' },
+]);
+
+const emptyStateDescription = computed(() => {
+    if (isFeedbackType.value) {
+        return translations.value.emptyStateDescriptionFeedback;
+    }
+    return translations.value.emptyStateDescription.replace('{noun}', feedbackNoun.value ?? '');
+});
 
 function handleScreenshotSelect(file: File): void {
     screenshot.value = file;
@@ -67,12 +95,6 @@ function handlePaste(event: ClipboardEvent): void {
         }
     }
 }
-
-const typeOptions = [
-    { value: 'bug' as const, label: 'Bug', icon: '🐛' },
-    { value: 'feature' as const, label: 'Feature', icon: '✨' },
-    { value: 'feedback' as const, label: 'Feedback', icon: '💬' },
-];
 
 async function handleSend(): Promise<void> {
     const message = inputMessage.value.trim();
@@ -138,7 +160,7 @@ watch(
     <div class="border-border bg-background flex h-[480px] w-[380px] flex-col rounded-xl border shadow-xl">
         <!-- Header -->
         <div class="border-border flex shrink-0 items-center justify-between border-b px-4 py-3">
-            <h3 class="text-sm font-semibold">Send Feedback</h3>
+            <h3 class="text-sm font-semibold">{{ translations.header }}</h3>
             <button
                 class="text-muted-foreground hover:bg-accent hover:text-accent-foreground inline-flex h-7 w-7 items-center justify-center rounded-md transition-colors"
                 @click="emit('close')"
@@ -172,14 +194,10 @@ watch(
                 v-if="messages.length === 0 && !isLoading"
                 class="text-muted-foreground flex h-full flex-col items-center justify-center gap-1 text-center text-sm"
             >
-                <p class="font-medium">{{ isFeedbackType ? 'How are we doing?' : 'How can we help?' }}</p>
-                <p class="text-xs">
-                    {{
-                        isFeedbackType
-                            ? 'Rate your experience and tell us what you think.'
-                            : `Describe your ${feedbackNoun} and we'll guide you through the details.`
-                    }}
+                <p class="font-medium">
+                    {{ isFeedbackType ? translations.emptyStateTitleFeedback : translations.emptyStateTitle }}
                 </p>
+                <p class="text-xs">{{ emptyStateDescription }}</p>
 
                 <!-- Star rating for feedback type -->
                 <div v-if="showStarRating" class="mt-2 flex gap-1">
@@ -239,19 +257,19 @@ watch(
         <!-- Success state -->
         <div v-if="issueUrl" class="border-border flex shrink-0 flex-col items-center gap-3 border-t p-4">
             <CheckCircle class="h-8 w-8 text-green-500" />
-            <p class="text-sm font-medium">Thank you for your feedback!</p>
+            <p class="text-sm font-medium">{{ translations.successMessage }}</p>
             <div class="mt-1 flex gap-2">
                 <button
                     class="border-input bg-background hover:bg-accent hover:text-accent-foreground inline-flex items-center justify-center rounded-md border px-3 py-1.5 text-sm font-medium transition-colors"
                     @click="handleNewConversation"
                 >
-                    Start over
+                    {{ translations.startOver }}
                 </button>
                 <button
                     class="text-muted-foreground hover:bg-accent hover:text-accent-foreground inline-flex items-center justify-center rounded-md px-3 py-1.5 text-sm font-medium transition-colors"
                     @click="emit('close')"
                 >
-                    Close
+                    {{ translations.close }}
                 </button>
             </div>
         </div>
@@ -262,7 +280,7 @@ watch(
             <div v-if="screenshotPreview" class="mb-2 inline-flex items-start gap-1">
                 <img
                     :src="screenshotPreview"
-                    alt="Screenshot preview"
+                    :alt="translations.screenshotPreview"
                     class="border-border h-16 w-auto rounded border object-cover"
                 />
                 <button
@@ -278,7 +296,7 @@ watch(
                     ref="textareaRef"
                     v-model="inputMessage"
                     :disabled="isLoading || isComplete"
-                    :placeholder="isComplete ? 'Creating issue...' : 'Type your message...'"
+                    :placeholder="isComplete ? translations.creatingIssuePlaceholder : translations.inputPlaceholder"
                     rows="1"
                     class="border-input bg-background text-foreground placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-ring/50 max-h-[100px] min-h-9 flex-1 resize-none rounded-md border px-3 py-2 text-sm transition-shadow outline-none focus-visible:ring-[3px]"
                     @keydown="handleKeydown"
