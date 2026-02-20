@@ -16,6 +16,7 @@ An AI-powered feedback widget for Laravel + Inertia + Vue apps. Users describe b
 - PHP 8.4+
 - Laravel 12+
 - Inertia.js v2 (Vue 3)
+- Tailwind CSS v4
 - An OpenAI API key
 - A GitHub App with issue write permissions
 
