@@ -6,7 +6,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+## [1.1.0] - 2026-02-21
+
 ### Added
+- Multilanguage support via `translations` prop and `locale` config
+- `FeedbackTranslations` interface and `defaultTranslations` export
+- AI response language controlled by `FEEDBACK_WIDGET_LOCALE` env variable
 - Vitest test suite with translations and composable tests
 - Accessibility: `role="dialog"`, `aria-modal`, `aria-live`, `aria-label`, `aria-pressed`, `aria-selected` attributes
 - Focus trap (Tab/Shift+Tab) and Escape-to-close in chat panel
@@ -18,14 +23,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 ### Fixed
 - Screenshot preview URL lifecycle managed in composable (prevents memory leaks from unreleased object URLs)
 
-## [1.1.0] - 2025-05-20
-
-### Added
-- Multilanguage support via `translations` prop and `locale` config
-- `FeedbackTranslations` interface and `defaultTranslations` export
-- AI response language controlled by `FEEDBACK_WIDGET_LOCALE` env variable
-
-## [1.0.0] - 2025-05-15
+## [1.0.0] - 2026-02-20
 
 ### Added
 - AI-guided feedback chat (bug, feature, feedback types)
