@@ -38,6 +38,8 @@ export interface FeedbackTranslations {
     genericError: string;
     networkError: string;
     issueCreationError: string;
+    rateLimitError: string;
+    maxMessagesError: string;
 }
 
 export const defaultTranslations: FeedbackTranslations = {
@@ -80,4 +82,6 @@ export const defaultTranslations: FeedbackTranslations = {
     genericError: 'Something went wrong. Please try again.',
     networkError: 'Network error. Please check your connection.',
     issueCreationError: 'Failed to create issue. Please try again.',
+    rateLimitError: 'Too many requests. Please wait a moment and try again.',
+    maxMessagesError: 'Conversation limit reached. Please start a new conversation.',
 };

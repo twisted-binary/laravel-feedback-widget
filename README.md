@@ -165,6 +165,8 @@ import { FeedbackWidget } from '@twisted-binary/feedback-widget';
 </template>
 ```
 
+**Note:** The widget uses a singleton pattern — only one instance per page is supported.
+
 That's it. The service provider automatically:
 - Registers routes (`POST /feedback/chat`, `POST /feedback/issue`)
 - Binds the chat and issue services

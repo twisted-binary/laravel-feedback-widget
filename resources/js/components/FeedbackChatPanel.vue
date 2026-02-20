@@ -13,12 +13,15 @@ const {
     isComplete,
     issueUrl,
     error,
-    screenshot,
+    screenshotPreview,
+    isOpen,
     feedbackType,
     translations,
     sendMessage,
     createIssue,
     reset,
+    setScreenshot,
+    clearScreenshot,
 } = useFeedbackChat();
 
 const feedbackNoun = computed(() => {
@@ -30,6 +33,7 @@ const feedbackNoun = computed(() => {
 });
 const inputMessage = ref('');
 const messagesContainer = ref<HTMLElement | null>(null);
+const panelRef = ref<HTMLElement | null>(null);
 
 const starRating = ref(0);
 const starHover = ref(0);
@@ -39,7 +43,6 @@ const isFeedbackType = computed(() => feedbackType.value === 'feedback');
 const showStarRating = computed(() => isFeedbackType.value && messages.value.length === 0 && !issueUrl.value);
 const fileInput = ref<HTMLInputElement | null>(null);
 const textareaRef = ref<HTMLTextAreaElement | null>(null);
-const screenshotPreview = ref<string | null>(null);
 
 const typeOptions = computed(() => [
     { value: 'bug' as const, label: translations.value.bugLabel, icon: '\uD83D\uDC1B' },
@@ -54,26 +57,13 @@ const emptyStateDescription = computed(() => {
     return translations.value.emptyStateDescription.replace('{noun}', feedbackNoun.value ?? '');
 });
 
-function handleScreenshotSelect(file: File): void {
-    screenshot.value = file;
-    screenshotPreview.value = URL.createObjectURL(file);
-}
-
 function handleFileChange(event: Event): void {
     const target = event.target as HTMLInputElement;
     const file = target.files?.[0];
     if (file) {
-        handleScreenshotSelect(file);
+        setScreenshot(file);
     }
     target.value = '';
-}
-
-function removeScreenshot(): void {
-    screenshot.value = null;
-    if (screenshotPreview.value) {
-        URL.revokeObjectURL(screenshotPreview.value);
-        screenshotPreview.value = null;
-    }
 }
 
 function handlePaste(event: ClipboardEvent): void {
@@ -89,11 +79,18 @@ function handlePaste(event: ClipboardEvent): void {
             event.preventDefault();
             const file = item.getAsFile();
             if (file) {
-                handleScreenshotSelect(file);
+                setScreenshot(file);
             }
             return;
         }
     }
+}
+
+function autoResizeTextarea(): void {
+    const textarea = textareaRef.value;
+    if (!textarea) return;
+    textarea.style.height = 'auto';
+    textarea.style.height = `${textarea.scrollHeight}px`;
 }
 
 async function handleSend(): Promise<void> {
@@ -108,6 +105,8 @@ async function handleSend(): Promise<void> {
     }
 
     inputMessage.value = '';
+    await nextTick();
+    autoResizeTextarea();
     await sendMessage(fullMessage, feedbackType.value);
 
     if (isComplete.value) {
@@ -122,8 +121,39 @@ function handleKeydown(event: KeyboardEvent): void {
     }
 }
 
+function getFocusableElements(): HTMLElement[] {
+    if (!panelRef.value) return [];
+    return Array.from(
+        panelRef.value.querySelectorAll<HTMLElement>(
+            'button:not([disabled]), textarea:not([disabled]), input:not([disabled]), [tabindex]:not([tabindex="-1"])',
+        ),
+    );
+}
+
+function handlePanelKeydown(event: KeyboardEvent): void {
+    if (event.key === 'Escape') {
+        emit('close');
+        return;
+    }
+
+    if (event.key === 'Tab') {
+        const focusable = getFocusableElements();
+        if (focusable.length === 0) return;
+
+        const first = focusable[0]!;
+        const last = focusable[focusable.length - 1]!;
+
+        if (event.shiftKey && document.activeElement === first) {
+            event.preventDefault();
+            last.focus();
+        } else if (!event.shiftKey && document.activeElement === last) {
+            event.preventDefault();
+            first.focus();
+        }
+    }
+}
+
 function handleNewConversation(): void {
-    removeScreenshot();
     reset();
     inputMessage.value = '';
     starRating.value = 0;
@@ -132,15 +162,15 @@ function handleNewConversation(): void {
 
 onMounted(() => {
     textareaRef.value?.addEventListener('paste', handlePaste);
-    if (screenshot.value && !screenshotPreview.value) {
-        screenshotPreview.value = URL.createObjectURL(screenshot.value);
-    }
 });
 
 onBeforeUnmount(() => {
     textareaRef.value?.removeEventListener('paste', handlePaste);
-    if (screenshotPreview.value) {
-        URL.revokeObjectURL(screenshotPreview.value);
+});
+
+watch(isOpen, (open) => {
+    if (open) {
+        nextTick(() => textareaRef.value?.focus());
     }
 });
 
@@ -157,11 +187,18 @@ watch(
 </script>
 
 <template>
-    <div class="border-border bg-background flex h-[480px] w-[380px] flex-col rounded-xl border shadow-xl">
+    <div
+        ref="panelRef"
+        role="dialog"
+        aria-modal="true"
+        class="border-border bg-background flex h-[480px] w-[380px] flex-col rounded-xl border shadow-xl"
+        @keydown="handlePanelKeydown"
+    >
         <!-- Header -->
         <div class="border-border flex shrink-0 items-center justify-between border-b px-4 py-3">
             <h3 class="text-sm font-semibold">{{ translations.header }}</h3>
             <button
+                :aria-label="translations.closeFeedback"
                 class="text-muted-foreground hover:bg-accent hover:text-accent-foreground inline-flex h-7 w-7 items-center justify-center rounded-md transition-colors"
                 @click="emit('close')"
             >
@@ -174,6 +211,7 @@ watch(
             <button
                 v-for="opt in typeOptions"
                 :key="opt.value"
+                :aria-selected="feedbackType === opt.value"
                 :class="[
                     'flex-1 rounded-md px-2 py-1.5 text-xs font-medium transition-colors',
                     feedbackType === opt.value
@@ -188,7 +226,7 @@ watch(
         </div>
 
         <!-- Messages -->
-        <div ref="messagesContainer" class="flex flex-1 flex-col gap-3 overflow-y-auto p-4">
+        <div ref="messagesContainer" aria-live="polite" class="flex flex-1 flex-col gap-3 overflow-y-auto p-4">
             <!-- Empty state -->
             <div
                 v-if="messages.length === 0 && !isLoading"
@@ -204,6 +242,8 @@ watch(
                     <button
                         v-for="star in 5"
                         :key="star"
+                        :aria-label="'Rate ' + star + ' out of 5 stars'"
+                        :aria-pressed="starRating === star"
                         class="transition-transform hover:scale-110"
                         @click="starRating = star"
                         @mouseenter="starHover = star"
@@ -283,10 +323,7 @@ watch(
                     :alt="translations.screenshotPreview"
                     class="border-border h-16 w-auto rounded border object-cover"
                 />
-                <button
-                    class="text-muted-foreground hover:text-foreground rounded-full p-0.5"
-                    @click="removeScreenshot"
-                >
+                <button class="text-muted-foreground hover:text-foreground rounded-full p-0.5" @click="clearScreenshot">
                     <X class="h-3 w-3" />
                 </button>
             </div>
@@ -300,11 +337,13 @@ watch(
                     rows="1"
                     class="border-input bg-background text-foreground placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-ring/50 max-h-[100px] min-h-9 flex-1 resize-none rounded-md border px-3 py-2 text-sm transition-shadow outline-none focus-visible:ring-[3px]"
                     @keydown="handleKeydown"
+                    @input="autoResizeTextarea"
                 />
                 <input ref="fileInput" type="file" accept="image/*" class="hidden" @change="handleFileChange" />
                 <button
                     v-if="isBugType"
                     :disabled="isLoading || isComplete"
+                    aria-label="Attach screenshot"
                     class="text-muted-foreground hover:bg-accent hover:text-accent-foreground inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-md transition-colors disabled:pointer-events-none disabled:opacity-50"
                     @click="fileInput?.click()"
                 >
@@ -312,6 +351,7 @@ watch(
                 </button>
                 <button
                     :disabled="!inputMessage.trim() || isLoading || isComplete"
+                    :aria-label="translations.sendFeedback"
                     class="bg-primary text-primary-foreground hover:bg-primary/90 inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-md transition-colors disabled:pointer-events-none disabled:opacity-50"
                     @click="handleSend"
                 >

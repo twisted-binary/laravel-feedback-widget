@@ -33,6 +33,8 @@ interface FeedbackWidgetProps {
     [key: string]: unknown;
 }
 
+const MAX_MESSAGES = 40;
+
 const messages = ref<ChatMessage[]>([]);
 const isLoading = ref(false);
 const isComplete = ref(false);
@@ -41,6 +43,7 @@ const issueNumber = ref<number | null>(null);
 const error = ref<string | null>(null);
 const structuredData = ref<{ title: string; body: string } | null>(null);
 const screenshot: Ref<File | null> = ref(null);
+const screenshotPreview = ref<string | null>(null);
 const isOpen = ref(false);
 const feedbackType = ref<'bug' | 'feature' | 'feedback'>('bug');
 const translations = ref<FeedbackTranslations>({ ...defaultTranslations });
@@ -50,6 +53,22 @@ function getRoutes(): { chat: string; issue: string } {
     return page.props.feedbackWidget.routes;
 }
 
+function setScreenshot(file: File): void {
+    if (screenshotPreview.value) {
+        URL.revokeObjectURL(screenshotPreview.value);
+    }
+    screenshot.value = file;
+    screenshotPreview.value = URL.createObjectURL(file);
+}
+
+function clearScreenshot(): void {
+    if (screenshotPreview.value) {
+        URL.revokeObjectURL(screenshotPreview.value);
+    }
+    screenshot.value = null;
+    screenshotPreview.value = null;
+}
+
 export function useFeedbackChat(options?: { translations?: Partial<FeedbackTranslations> }) {
     if (options?.translations) {
         translations.value = { ...defaultTranslations, ...options.translations };
@@ -57,6 +76,11 @@ export function useFeedbackChat(options?: { translations?: Partial<FeedbackTrans
 
     async function sendMessage(message: string, type: string): Promise<void> {
         error.value = null;
+
+        if (messages.value.length >= MAX_MESSAGES) {
+            error.value = translations.value.maxMessagesError;
+            return;
+        }
 
         messages.value.push({ role: 'user', content: message });
 
@@ -89,6 +113,12 @@ export function useFeedbackChat(options?: { translations?: Partial<FeedbackTrans
             if (response.status === 422) {
                 const data = await response.json();
                 error.value = data.message || translations.value.validationError;
+                messages.value.pop();
+                return;
+            }
+
+            if (response.status === 429) {
+                error.value = translations.value.rateLimitError;
                 messages.value.pop();
                 return;
             }
@@ -162,6 +192,11 @@ export function useFeedbackChat(options?: { translations?: Partial<FeedbackTrans
                 return;
             }
 
+            if (response.status === 429) {
+                error.value = translations.value.rateLimitError;
+                return;
+            }
+
             if (!response.ok) {
                 const data = await response.json();
                 error.value = data.error || translations.value.issueCreationError;
@@ -188,6 +223,10 @@ export function useFeedbackChat(options?: { translations?: Partial<FeedbackTrans
         error.value = null;
         structuredData.value = null;
         screenshot.value = null;
+        if (screenshotPreview.value) {
+            URL.revokeObjectURL(screenshotPreview.value);
+        }
+        screenshotPreview.value = null;
         feedbackType.value = 'bug';
     }
 
@@ -200,12 +239,15 @@ export function useFeedbackChat(options?: { translations?: Partial<FeedbackTrans
         error,
         structuredData,
         screenshot,
+        screenshotPreview,
         isOpen,
         feedbackType,
         translations,
         sendMessage,
         createIssue,
         reset,
+        setScreenshot,
+        clearScreenshot,
     };
 }
 
