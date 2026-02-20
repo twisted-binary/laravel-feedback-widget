@@ -1,0 +1,150 @@
+<?php
+
+declare(strict_types=1);
+
+use OpenAI\Laravel\Facades\OpenAI;
+use OpenAI\Responses\Chat\CreateResponse;
+use TwistedBinary\FeedbackWidget\Data\FeedbackChatResult;
+use TwistedBinary\FeedbackWidget\Services\FeedbackChatService;
+
+beforeEach(function (): void {
+    $this->service = new FeedbackChatService(model: 'gpt-4o-mini', appName: 'TestApp');
+});
+
+it('returns a non-complete result for normal replies', function (): void {
+    OpenAI::fake([
+        CreateResponse::fake([
+            'choices' => [
+                ['message' => ['role' => 'assistant', 'content' => 'Can you describe the steps?']],
+            ],
+        ]),
+    ]);
+
+    $result = $this->service->chat('Button is broken', [], 'bug');
+
+    expect($result)
+        ->toBeInstanceOf(FeedbackChatResult::class)
+        ->reply->toBe('Can you describe the steps?')
+        ->isComplete->toBeFalse()
+        ->structuredData->toBeNull();
+});
+
+it('detects the sentinel and returns structured data', function (): void {
+    $content = 'Great, here is a summary of your bug report.'
+        ."\n"
+        .'{"__done__": true, "title": "[Bug] Button broken on dashboard", "body": "## Steps\n1. Click the button"}';
+
+    OpenAI::fake([
+        CreateResponse::fake([
+            'choices' => [
+                ['message' => ['role' => 'assistant', 'content' => $content]],
+            ],
+        ]),
+    ]);
+
+    $result = $this->service->chat('Yes, that looks correct', [
+        ['role' => 'user', 'content' => 'The button is broken'],
+        ['role' => 'assistant', 'content' => 'Can you describe the steps?'],
+    ], 'bug');
+
+    expect($result)
+        ->isComplete->toBeTrue()
+        ->structuredData->toBe([
+            'title' => '[Bug] Button broken on dashboard',
+            'body' => "## Steps\n1. Click the button",
+        ])
+        ->reply->toBe('Great, here is a summary of your bug report.');
+});
+
+it('returns non-complete result when sentinel JSON is malformed', function (): void {
+    $content = 'Here is some text with __done__ but no valid JSON';
+
+    OpenAI::fake([
+        CreateResponse::fake([
+            'choices' => [
+                ['message' => ['role' => 'assistant', 'content' => $content]],
+            ],
+        ]),
+    ]);
+
+    $result = $this->service->chat('Hello', [], 'feedback');
+
+    expect($result)
+        ->isComplete->toBeFalse()
+        ->reply->toBe($content);
+});
+
+it('throws RuntimeException when OpenAI returns empty content', function (): void {
+    OpenAI::fake([
+        CreateResponse::fake([
+            'choices' => [
+                ['message' => ['role' => 'assistant', 'content' => '']],
+            ],
+        ]),
+    ]);
+
+    expect(fn () => $this->service->chat('Hello', [], 'bug'))
+        ->toThrow(RuntimeException::class);
+});
+
+it('passes history and type correctly to OpenAI', function (): void {
+    OpenAI::fake([
+        CreateResponse::fake([
+            'choices' => [
+                ['message' => ['role' => 'assistant', 'content' => 'Got it.']],
+            ],
+        ]),
+    ]);
+
+    $history = [
+        ['role' => 'user', 'content' => 'First message'],
+        ['role' => 'assistant', 'content' => 'First reply'],
+    ];
+
+    $result = $this->service->chat('Second message', $history, 'feature');
+
+    expect($result)->reply->toBe('Got it.');
+});
+
+it('handles nested braces in the JSON body', function (): void {
+    $content = 'Here is your issue.'
+        ."\n"
+        .'{"__done__": true, "title": "[Bug] Template rendering fails", "body": "## Code\n```\nif (x) { doThing(); }\n```"}';
+
+    OpenAI::fake([
+        CreateResponse::fake([
+            'choices' => [
+                ['message' => ['role' => 'assistant', 'content' => $content]],
+            ],
+        ]),
+    ]);
+
+    $result = $this->service->chat('Confirmed', [], 'bug');
+
+    expect($result)
+        ->isComplete->toBeTrue()
+        ->reply->toBe('Here is your issue.')
+        ->structuredData->toBe([
+            'title' => '[Bug] Template rendering fails',
+            'body' => "## Code\n```\nif (x) { doThing(); }\n```",
+        ]);
+});
+
+it('provides a default reply when sentinel is found but visible text is empty', function (): void {
+    $content = '{"__done__": true, "title": "[Feature] Add dark mode", "body": "## Description\nAdd dark mode support"}';
+
+    OpenAI::fake([
+        CreateResponse::fake([
+            'choices' => [
+                ['message' => ['role' => 'assistant', 'content' => $content]],
+            ],
+        ]),
+    ]);
+
+    $result = $this->service->chat('Confirmed', [], 'feature');
+
+    expect($result)
+        ->isComplete->toBeTrue()
+        ->reply->toBe('Thank you! Creating your issue now...')
+        ->structuredData->not->toBeNull();
+});

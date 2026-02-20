@@ -1,0 +1,15 @@
+{
+    "name": "@twisted-binary/feedback-widget",
+    "version": "1.0.0",
+    "description": "AI-powered feedback widget for Laravel + Inertia + Vue apps.",
+    "license": "MIT",
+    "type": "module",
+    "exports": {
+        ".": "./resources/js/index.ts"
+    },
+    "peerDependencies": {
+        "vue": "^3.5",
+        "@inertiajs/vue3": "^2",
+        "lucide-vue-next": ">=0.400"
+    }
+}
