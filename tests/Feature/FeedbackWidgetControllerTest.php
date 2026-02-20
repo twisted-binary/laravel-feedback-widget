@@ -33,6 +33,7 @@ describe('POST /feedback/chat', function (): void {
         'message too long' => [['message' => str_repeat('a', 2001), 'type' => 'bug'], 'message'],
         'history too large' => [['message' => 'Hi', 'type' => 'bug', 'history' => array_fill(0, 21, ['role' => 'user', 'content' => 'x'])], 'history'],
         'invalid history role' => [['message' => 'Hi', 'type' => 'bug', 'history' => [['role' => 'system', 'content' => 'x']]], 'history.0.role'],
+        'history content too long' => [['message' => 'Hi', 'type' => 'bug', 'history' => [['role' => 'user', 'content' => str_repeat('a', 5001)]]], 'history.0.content'],
     ]);
 
     it('returns a chat reply', function (): void {
@@ -129,6 +130,34 @@ describe('POST /feedback/issue', function (): void {
         'title too long' => [['title' => str_repeat('a', 256), 'body' => 'Something', 'type' => 'bug'], 'title'],
         'body too long' => [['title' => 'Bug', 'body' => str_repeat('a', 10001), 'type' => 'bug'], 'body'],
     ]);
+
+    it('rejects a screenshot with invalid mime type', function (): void {
+        $user = $this->createAuthenticatedUser();
+
+        $response = $this->actingAs($user)->postJson(route('feedback.issue'), [
+            'title' => 'Test',
+            'body' => 'Test body',
+            'type' => 'bug',
+            'screenshot' => UploadedFile::fake()->create('document.pdf', 100, 'application/pdf'),
+        ]);
+
+        $response->assertUnprocessable();
+        $response->assertJsonValidationErrors('screenshot');
+    });
+
+    it('rejects an oversized screenshot', function (): void {
+        $user = $this->createAuthenticatedUser();
+
+        $response = $this->actingAs($user)->postJson(route('feedback.issue'), [
+            'title' => 'Test',
+            'body' => 'Test body',
+            'type' => 'bug',
+            'screenshot' => UploadedFile::fake()->image('large.png')->size(5121),
+        ]);
+
+        $response->assertUnprocessable();
+        $response->assertJsonValidationErrors('screenshot');
+    });
 
     it('creates a GitHub issue and returns its URL', function (): void {
         $user = $this->createAuthenticatedUser();
