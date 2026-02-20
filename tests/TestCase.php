@@ -23,6 +23,15 @@ abstract class TestCase extends BaseTestCase
     }
 
     /**
+     * @param  \Illuminate\Foundation\Application  $app
+     */
+    #[Override]
+    protected function defineEnvironment($app): void
+    {
+        $app['config']->set('app.key', 'base64:'.base64_encode(random_bytes(32)));
+    }
+
+    /**
      * Create a simple authenticated user for testing.
      */
     public function createAuthenticatedUser(int $id = 1): Authenticatable
