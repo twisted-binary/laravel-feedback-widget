@@ -4,12 +4,24 @@
     "description": "AI-powered feedback widget for Laravel + Inertia + Vue apps.",
     "license": "MIT",
     "type": "module",
+    "scripts": {
+        "format": "prettier --write resources/js",
+        "format:check": "prettier --check resources/js",
+        "typecheck": "vue-tsc --noEmit"
+    },
     "exports": {
         ".": "./resources/js/index.ts"
     },
     "peerDependencies": {
-        "vue": "^3.5",
         "@inertiajs/vue3": "^2",
-        "lucide-vue-next": ">=0.400"
+        "lucide-vue-next": ">=0.400",
+        "vue": "^3.5"
+    },
+    "devDependencies": {
+        "@vue/tsconfig": "^0.8.1",
+        "prettier": "^3.8.1",
+        "prettier-plugin-tailwindcss": "^0.7.2",
+        "typescript": "^5.9.3",
+        "vue-tsc": "^3.2.4"
     }
 }

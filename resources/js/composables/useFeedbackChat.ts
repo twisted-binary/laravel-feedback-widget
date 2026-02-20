@@ -29,6 +29,7 @@ interface FeedbackWidgetProps {
             issue: string;
         };
     };
+    [key: string]: unknown;
 }
 
 const messages = ref<ChatMessage[]>([]);
@@ -203,5 +204,5 @@ export function useFeedbackChat() {
 
 function getCsrfToken(): string {
     const match = document.cookie.match(/XSRF-TOKEN=([^;]+)/);
-    return match ? decodeURIComponent(match[1]) : '';
+    return match?.[1] ? decodeURIComponent(match[1]) : '';
 }

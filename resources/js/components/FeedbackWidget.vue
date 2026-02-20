@@ -25,7 +25,7 @@ const { isOpen } = useFeedbackChat();
 
             <!-- FAB button -->
             <button
-                class="flex h-12 w-12 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg transition-transform hover:scale-105 hover:bg-primary/90 focus:ring-2 focus:ring-offset-2 focus:outline-none"
+                class="bg-primary text-primary-foreground hover:bg-primary/90 flex h-12 w-12 items-center justify-center rounded-full shadow-lg transition-transform hover:scale-105 focus:ring-2 focus:ring-offset-2 focus:outline-none"
                 :aria-label="isOpen ? 'Close feedback' : 'Send feedback'"
                 @click="isOpen = !isOpen"
             >

@@ -7,7 +7,8 @@ const emit = defineEmits<{
     close: [];
 }>();
 
-const { messages, isLoading, isComplete, issueUrl, error, screenshot, feedbackType, sendMessage, createIssue, reset } = useFeedbackChat();
+const { messages, isLoading, isComplete, issueUrl, error, screenshot, feedbackType, sendMessage, createIssue, reset } =
+    useFeedbackChat();
 
 const feedbackNoun = computed(() => {
     return { bug: 'issue', feature: 'idea', feedback: 'feedback' }[feedbackType.value];
@@ -134,12 +135,12 @@ watch(
 </script>
 
 <template>
-    <div class="flex h-[480px] w-[380px] flex-col rounded-xl border border-border bg-background shadow-xl">
+    <div class="border-border bg-background flex h-[480px] w-[380px] flex-col rounded-xl border shadow-xl">
         <!-- Header -->
-        <div class="flex shrink-0 items-center justify-between border-b border-border px-4 py-3">
+        <div class="border-border flex shrink-0 items-center justify-between border-b px-4 py-3">
             <h3 class="text-sm font-semibold">Send Feedback</h3>
             <button
-                class="inline-flex h-7 w-7 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground"
+                class="text-muted-foreground hover:bg-accent hover:text-accent-foreground inline-flex h-7 w-7 items-center justify-center rounded-md transition-colors"
                 @click="emit('close')"
             >
                 <X class="h-4 w-4" />
@@ -147,7 +148,7 @@ watch(
         </div>
 
         <!-- Type Toggle -->
-        <div v-if="!issueUrl" class="flex shrink-0 gap-1 border-b border-border p-2">
+        <div v-if="!issueUrl" class="border-border flex shrink-0 gap-1 border-b p-2">
             <button
                 v-for="opt in typeOptions"
                 :key="opt.value"
@@ -169,7 +170,7 @@ watch(
             <!-- Empty state -->
             <div
                 v-if="messages.length === 0 && !isLoading"
-                class="flex h-full flex-col items-center justify-center gap-1 text-center text-sm text-muted-foreground"
+                class="text-muted-foreground flex h-full flex-col items-center justify-center gap-1 text-center text-sm"
             >
                 <p class="font-medium">{{ isFeedbackType ? 'How are we doing?' : 'How can we help?' }}</p>
                 <p class="text-xs">
@@ -192,14 +193,22 @@ watch(
                     >
                         <Star
                             class="h-7 w-7"
-                            :class="star <= (starHover || starRating) ? 'fill-yellow-400 text-yellow-400' : 'text-muted-foreground/40'"
+                            :class="
+                                star <= (starHover || starRating)
+                                    ? 'fill-yellow-400 text-yellow-400'
+                                    : 'text-muted-foreground/40'
+                            "
                         />
                     </button>
                 </div>
             </div>
 
             <!-- Message bubbles -->
-            <div v-for="(msg, index) in messages" :key="index" :class="['flex', msg.role === 'user' ? 'justify-end' : 'justify-start']">
+            <div
+                v-for="(msg, index) in messages"
+                :key="index"
+                :class="['flex', msg.role === 'user' ? 'justify-end' : 'justify-start']"
+            >
                 <div
                     :class="[
                         'max-w-[85%] rounded-lg px-3 py-2 text-sm',
@@ -212,9 +221,9 @@ watch(
 
             <!-- Loading skeleton -->
             <div v-if="isLoading" class="flex justify-start">
-                <div class="flex max-w-[85%] flex-col gap-2 rounded-lg bg-muted px-3 py-2">
-                    <div class="h-3 w-48 animate-pulse rounded bg-muted-foreground/20" />
-                    <div class="h-3 w-32 animate-pulse rounded bg-muted-foreground/20" />
+                <div class="bg-muted flex max-w-[85%] flex-col gap-2 rounded-lg px-3 py-2">
+                    <div class="bg-muted-foreground/20 h-3 w-48 animate-pulse rounded" />
+                    <div class="bg-muted-foreground/20 h-3 w-32 animate-pulse rounded" />
                 </div>
             </div>
 
@@ -228,18 +237,18 @@ watch(
         </div>
 
         <!-- Success state -->
-        <div v-if="issueUrl" class="flex shrink-0 flex-col items-center gap-3 border-t border-border p-4">
+        <div v-if="issueUrl" class="border-border flex shrink-0 flex-col items-center gap-3 border-t p-4">
             <CheckCircle class="h-8 w-8 text-green-500" />
             <p class="text-sm font-medium">Thank you for your feedback!</p>
             <div class="mt-1 flex gap-2">
                 <button
-                    class="inline-flex items-center justify-center rounded-md border border-input bg-background px-3 py-1.5 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground"
+                    class="border-input bg-background hover:bg-accent hover:text-accent-foreground inline-flex items-center justify-center rounded-md border px-3 py-1.5 text-sm font-medium transition-colors"
                     @click="handleNewConversation"
                 >
                     Start over
                 </button>
                 <button
-                    class="inline-flex items-center justify-center rounded-md px-3 py-1.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground"
+                    class="text-muted-foreground hover:bg-accent hover:text-accent-foreground inline-flex items-center justify-center rounded-md px-3 py-1.5 text-sm font-medium transition-colors"
                     @click="emit('close')"
                 >
                     Close
@@ -248,11 +257,18 @@ watch(
         </div>
 
         <!-- Input -->
-        <div v-else class="shrink-0 border-t border-border p-3">
+        <div v-else class="border-border shrink-0 border-t p-3">
             <!-- Screenshot preview -->
             <div v-if="screenshotPreview" class="mb-2 inline-flex items-start gap-1">
-                <img :src="screenshotPreview" alt="Screenshot preview" class="h-16 w-auto rounded border border-border object-cover" />
-                <button class="rounded-full p-0.5 text-muted-foreground hover:text-foreground" @click="removeScreenshot">
+                <img
+                    :src="screenshotPreview"
+                    alt="Screenshot preview"
+                    class="border-border h-16 w-auto rounded border object-cover"
+                />
+                <button
+                    class="text-muted-foreground hover:text-foreground rounded-full p-0.5"
+                    @click="removeScreenshot"
+                >
                     <X class="h-3 w-3" />
                 </button>
             </div>
@@ -264,21 +280,21 @@ watch(
                     :disabled="isLoading || isComplete"
                     :placeholder="isComplete ? 'Creating issue...' : 'Type your message...'"
                     rows="1"
-                    class="max-h-[100px] min-h-[36px] flex-1 resize-none rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground transition-shadow outline-none placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50"
+                    class="border-input bg-background text-foreground placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-ring/50 max-h-[100px] min-h-9 flex-1 resize-none rounded-md border px-3 py-2 text-sm transition-shadow outline-none focus-visible:ring-[3px]"
                     @keydown="handleKeydown"
                 />
                 <input ref="fileInput" type="file" accept="image/*" class="hidden" @change="handleFileChange" />
                 <button
                     v-if="isBugType"
                     :disabled="isLoading || isComplete"
-                    class="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground disabled:pointer-events-none disabled:opacity-50"
+                    class="text-muted-foreground hover:bg-accent hover:text-accent-foreground inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-md transition-colors disabled:pointer-events-none disabled:opacity-50"
                     @click="fileInput?.click()"
                 >
                     <ImagePlus class="h-4 w-4" />
                 </button>
                 <button
                     :disabled="!inputMessage.trim() || isLoading || isComplete"
-                    class="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-md bg-primary text-primary-foreground transition-colors hover:bg-primary/90 disabled:pointer-events-none disabled:opacity-50"
+                    class="bg-primary text-primary-foreground hover:bg-primary/90 inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-md transition-colors disabled:pointer-events-none disabled:opacity-50"
                     @click="handleSend"
                 >
                     <Loader2 v-if="isLoading" class="h-4 w-4 animate-spin" />
