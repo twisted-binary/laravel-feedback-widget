@@ -86,6 +86,46 @@ php artisan vendor:publish --tag=feedback-widget-config
 
 This publishes `config/feedback-widget.php` where you can customize routes, middleware, throttling, and more.
 
+## GitHub App Setup
+
+This package uses a GitHub App (not a personal access token) to create issues. Here's how to set one up:
+
+### 1. Create the GitHub App
+
+Go to [github.com/settings/apps/new](https://github.com/settings/apps/new) and configure:
+
+| Field | Value |
+|-------|-------|
+| App name | Something like `myapp-feedback` |
+| Homepage URL | Your app URL |
+| Webhook | Uncheck "Active" (not needed) |
+| Permissions → Repository → Issues | Read & write |
+| Where can this app be installed? | Only on this account |
+
+Click **Create GitHub App**. Note the **App ID** shown on the next page.
+
+### 2. Generate a private key
+
+On the app settings page, scroll to **Private keys** → **Generate a private key**. A `.pem` file downloads.
+
+### 3. Install the app on your repo
+
+On the app settings page, click **Install App** in the left sidebar → **Install** on your account → select **Only select repositories** → pick your feedback repo → **Install**.
+
+Note the **Installation ID** from the URL after installing:
+
+```
+https://github.com/settings/installations/INSTALLATION_ID
+```
+
+### 4. Base64-encode the private key
+
+```bash
+cat your-app.private-key.pem | base64 | tr -d '\n'
+```
+
+Copy the output — you'll use it as `GITHUB_APP_PRIVATE_KEY` below.
+
 ## Environment Variables
 
 Add these to your `.env`:
