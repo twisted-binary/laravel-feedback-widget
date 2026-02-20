@@ -87,6 +87,33 @@ php artisan vendor:publish --tag=feedback-widget-config
 
 This publishes `config/feedback-widget.php` where you can customize routes, middleware, throttling, and more.
 
+## OpenAI API Setup
+
+This package uses the OpenAI API to power the guided feedback chat. Here's how to get set up:
+
+### 1. Create an OpenAI account
+
+Go to [platform.openai.com](https://platform.openai.com/) and sign up or log in.
+
+### 2. Add billing
+
+Navigate to **Settings** → **Billing** and add a payment method. The API is pay-per-use — the default `gpt-4o-mini` model is very affordable for short feedback conversations.
+
+### 3. Generate an API key
+
+Go to **API keys** ([platform.openai.com/api-keys](https://platform.openai.com/api-keys)) → **Create new secret key**.
+
+Give it a name (e.g. `feedback-widget`) and copy the key — you won't be able to see it again.
+
+### 4. Add to your `.env`
+
+```env
+OPENAI_API_KEY=sk-...
+OPENAI_FEEDBACK_MODEL=gpt-4o-mini    # optional, defaults to gpt-4o-mini
+```
+
+The `OPENAI_FEEDBACK_MODEL` setting is optional. `gpt-4o-mini` is the default and works well for feedback conversations. You can switch to `gpt-4o` for higher quality responses at a higher cost.
+
 ## GitHub App Setup
 
 This package uses a GitHub App (not a personal access token) to create issues. Here's how to set one up:
