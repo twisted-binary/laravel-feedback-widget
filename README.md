@@ -24,24 +24,8 @@ An AI-powered feedback widget for Laravel + Inertia + Vue apps. Users describe b
 
 ### 1. Composer
 
-Since this package isn't on Packagist, add the VCS repository:
-
-```json
-{
-    "repositories": [
-        {
-            "type": "vcs",
-            "url": "https://github.com/twisted-binary/laravel-feedback-widget.git"
-        }
-    ],
-    "require": {
-        "twisted-binary/laravel-feedback-widget": "^1.0"
-    }
-}
-```
-
 ```bash
-composer update twisted-binary/laravel-feedback-widget
+composer require twisted-binary/laravel-feedback-widget
 ```
 
 ### 2. Vite config
