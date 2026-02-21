@@ -16,7 +16,6 @@ An AI-powered feedback widget for Laravel + Inertia + Vue apps. Users describe b
 - PHP 8.4+
 - Laravel 12+
 - Inertia.js v2 (Vue 3)
-- Tailwind CSS v4
 - An OpenAI API key
 - A GitHub App with issue write permissions
 
@@ -47,15 +46,7 @@ export default defineConfig({
 });
 ```
 
-### 3. Tailwind CSS v4 — scan the package
-
-Add this to your CSS so Tailwind picks up classes from the widget:
-
-```css
-@source "../../vendor/twisted-binary/laravel-feedback-widget/resources/js";
-```
-
-### 4. Publish config (optional)
+### 3. Publish config (optional)
 
 ```bash
 php artisan vendor:publish --tag=feedback-widget-config

@@ -13,29 +13,104 @@ const { isOpen, translations } = useFeedbackChat({ translations: props.translati
 
 <template>
     <Teleport to="body">
-        <div class="fixed right-6 bottom-6 z-50">
+        <div class="tbfw-widget tbfw-anchor">
             <!-- Chat panel -->
-            <Transition
-                enter-active-class="transition duration-200 ease-out"
-                enter-from-class="translate-y-2 scale-95 opacity-0"
-                enter-to-class="translate-y-0 scale-100 opacity-100"
-                leave-active-class="transition duration-150 ease-in"
-                leave-from-class="translate-y-0 scale-100 opacity-100"
-                leave-to-class="translate-y-2 scale-95 opacity-0"
-            >
-                <div v-show="isOpen" class="mb-3">
+            <Transition name="tbfw-panel">
+                <div v-show="isOpen" class="tbfw-panel-wrapper">
                     <FeedbackChatPanel @close="isOpen = false" />
                 </div>
             </Transition>
 
             <!-- FAB button -->
             <button
-                class="bg-primary text-primary-foreground hover:bg-primary/90 flex h-12 w-12 items-center justify-center rounded-full shadow-lg transition-transform hover:scale-105 focus:ring-2 focus:ring-offset-2 focus:outline-none"
+                class="tbfw-fab"
                 :aria-label="isOpen ? translations.closeFeedback : translations.sendFeedback"
                 @click="isOpen = !isOpen"
             >
-                <MessageSquarePlus class="h-5 w-5" />
+                <MessageSquarePlus class="tbfw-icon-md" />
             </button>
         </div>
     </Teleport>
 </template>
+
+<style scoped>
+.tbfw-widget {
+    --tbfw-primary: #18181b;
+    --tbfw-primary-fg: #fff;
+    --tbfw-bg: #fff;
+    --tbfw-fg: #09090b;
+    --tbfw-muted: #f4f4f5;
+    --tbfw-muted-fg: #71717a;
+    --tbfw-border: #e4e4e7;
+    --tbfw-input: #e4e4e7;
+    --tbfw-ring: #18181b;
+    --tbfw-accent: #f4f4f5;
+    --tbfw-accent-fg: #18181b;
+    --tbfw-radius: 0.75rem;
+    --tbfw-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+}
+
+.tbfw-anchor {
+    position: fixed;
+    right: 1.5rem;
+    bottom: 1.5rem;
+    z-index: 50;
+}
+
+.tbfw-panel-wrapper {
+    margin-bottom: 0.75rem;
+}
+
+.tbfw-fab {
+    display: flex;
+    height: 3rem;
+    width: 3rem;
+    align-items: center;
+    justify-content: center;
+    border-radius: 9999px;
+    border: none;
+    cursor: pointer;
+    background-color: var(--tbfw-primary);
+    color: var(--tbfw-primary-fg);
+    box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+    transition: transform 0.15s ease;
+}
+
+.tbfw-fab:hover {
+    opacity: 0.9;
+    transform: scale(1.05);
+}
+
+.tbfw-fab:focus {
+    outline: none;
+    box-shadow:
+        0 0 0 2px var(--tbfw-bg),
+        0 0 0 4px var(--tbfw-ring);
+}
+
+.tbfw-icon-md {
+    width: 1.25rem;
+    height: 1.25rem;
+}
+
+/* Panel transition */
+.tbfw-panel-enter-active {
+    transition: all 0.2s ease-out;
+}
+
+.tbfw-panel-leave-active {
+    transition: all 0.15s ease-in;
+}
+
+.tbfw-panel-enter-from,
+.tbfw-panel-leave-to {
+    opacity: 0;
+    transform: translateY(0.5rem) scale(0.95);
+}
+
+.tbfw-panel-enter-to,
+.tbfw-panel-leave-from {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+}
+</style>
