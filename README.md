@@ -44,18 +44,23 @@ Since this package isn't on Packagist, add the VCS repository:
 composer update twisted-binary/laravel-feedback-widget
 ```
 
-### 2. npm
+### 2. Vite config
 
-```json
-{
-    "dependencies": {
-        "@twisted-binary/feedback-widget": "github:twisted-binary/laravel-feedback-widget#semver:^1.0"
-    }
-}
-```
+The Vue components ship as raw SFCs inside the Composer package. Add a resolve alias so Vite can find them:
 
-```bash
-npm install
+```ts
+import path from 'node:path';
+
+export default defineConfig({
+    resolve: {
+        alias: {
+            '@twisted-binary/feedback-widget': path.resolve(
+                'vendor/twisted-binary/laravel-feedback-widget/resources/js/index.ts',
+            ),
+        },
+    },
+    // ...
+});
 ```
 
 ### 3. Tailwind CSS v4 — scan the package
@@ -63,23 +68,10 @@ npm install
 Add this to your CSS so Tailwind picks up classes from the widget:
 
 ```css
-@source "../../node_modules/@twisted-binary/feedback-widget";
+@source "../../vendor/twisted-binary/laravel-feedback-widget/resources/js";
 ```
 
-### 4. Vite config — dedupe peer dependencies
-
-If you're using `file:` or symlinked references during development, add `resolve.dedupe` to your `vite.config.ts`:
-
-```ts
-export default defineConfig({
-    resolve: {
-        dedupe: ['vue', '@inertiajs/vue3', 'lucide-vue-next'],
-    },
-    // ...
-});
-```
-
-### 5. Publish config (optional)
+### 4. Publish config (optional)
 
 ```bash
 php artisan vendor:publish --tag=feedback-widget-config
@@ -262,7 +254,7 @@ You only need to pass the strings you want to override — all others fall back 
 
 ## Exports
 
-The npm package exports:
+The package exports:
 
 ```ts
 import { FeedbackWidget, FeedbackChatPanel, useFeedbackChat } from '@twisted-binary/feedback-widget';
