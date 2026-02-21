@@ -6,6 +6,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+## [1.3.0] - 2026-02-21
+
+### Changed
+- Bug and feature prompts now confirm understanding conversationally instead of showing structured title/body data
+- Feedback prompt submits immediately without requiring user confirmation
+- Tightened chat endpoint throttle from 30 to 10 requests per minute
+
 ## [1.2.0] - 2026-02-21
 
 ### Changed
