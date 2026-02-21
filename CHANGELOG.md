@@ -6,6 +6,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+## [1.1.1] - 2026-02-21
+
+### Changed
+- npm install instruction now pins to a semver range (`^1.0`)
+- Removed `package-lock.json` from repository (lock files are ignored by consuming apps)
+
 ## [1.1.0] - 2026-02-21
 
 ### Added
