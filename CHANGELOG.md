@@ -6,6 +6,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+## [1.2.0] - 2026-02-21
+
+### Changed
+- Replaced Tailwind CSS utility classes with self-contained scoped CSS using `tbfw-` prefixed class names
+- Widget now renders correctly without Tailwind CSS or shadcn/ui theme variables
+- CSS custom properties (`--tbfw-*`) defined on `.tbfw-widget` root for consumer overrides
+- Removed `tailwindcss` from peerDependencies and `prettier-plugin-tailwindcss` from devDependencies
+- Removed `@source` directive step from installation docs
+
 ## [1.1.1] - 2026-02-21
 
 ### Changed
