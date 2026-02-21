@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useFeedbackChat } from '../composables/useFeedbackChat';
-import { CheckCircle, ImagePlus, Loader2, Send, Star, X } from 'lucide-vue-next';
+import { CheckCircle, ImagePlus, Loader2, Send, Star, X } from './icons';
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue';
 
 const emit = defineEmits<{

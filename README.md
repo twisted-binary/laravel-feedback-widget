@@ -209,6 +209,10 @@ return [
 
 Set `FEEDBACK_WIDGET_LOCALE` in your `.env` to control the language the AI responds in. When not set, it falls back to `app()->getLocale()`. For English (`en`), no extra instruction is prepended to the AI prompt.
 
+#### Per-user locale
+
+Leave `FEEDBACK_WIDGET_LOCALE` unset and the widget will automatically use whatever locale your app has set for the current request. If you already set the locale per user via middleware (e.g. `app()->setLocale($user->locale)`), the AI will respond in that user's language with no extra configuration.
+
 ### UI Translations (`translations` prop)
 
 All UI strings have English defaults. To translate the widget, pass a `translations` prop with your overrides:

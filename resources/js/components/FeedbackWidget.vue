@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { MessageSquarePlus } from 'lucide-vue-next';
+import { MessageSquarePlus } from './icons';
 import FeedbackChatPanel from './FeedbackChatPanel.vue';
 import { useFeedbackChat } from '../composables/useFeedbackChat';
 import type { FeedbackTranslations } from '../translations';
