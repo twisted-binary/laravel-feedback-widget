@@ -6,7 +6,7 @@ return [
     'route_prefix' => env('FEEDBACK_WIDGET_ROUTE_PREFIX', 'feedback'),
     'middleware' => ['web', 'auth', 'verified'],
     'throttle' => [
-        'chat' => '30,1',
+        'chat' => '10,1',
         'issue' => '5,1',
     ],
     'openai_model' => env('OPENAI_FEEDBACK_MODEL', 'gpt-4o-mini'),
