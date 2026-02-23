@@ -55,8 +55,11 @@ final readonly class FeedbackChatService implements FeedbackChatServiceInterface
             return new FeedbackChatResult(reply: $content, isComplete: false);
         }
 
-        // Walk backwards from the last '}' to find the matching '{' via brace depth
-        $end = mb_strrpos($content, '}');
+        // Walk backwards from the last '}' to find the matching '{' via brace depth.
+        // Use byte-string functions throughout — JSON delimiters are single-byte ASCII,
+        // and mixing mb_strrpos (character offsets) with $content[$i] (byte offsets)
+        // breaks on multibyte content like accented characters.
+        $end = strrpos($content, '}');
 
         if ($end === false) {
             return new FeedbackChatResult(reply: $content, isComplete: false);
@@ -82,14 +85,14 @@ final readonly class FeedbackChatService implements FeedbackChatServiceInterface
             return new FeedbackChatResult(reply: $content, isComplete: false);
         }
 
-        $candidate = mb_substr($content, $start, $end - $start + 1);
+        $candidate = substr($content, $start, $end - $start + 1);
         $json = json_decode($candidate, true);
 
         if (! is_array($json) || ! isset($json[self::SENTINEL], $json['title'], $json['body'])) {
             return new FeedbackChatResult(reply: $content, isComplete: false);
         }
 
-        $visibleReply = mb_trim(mb_substr($content, 0, $start).mb_substr($content, $end + 1));
+        $visibleReply = trim(substr($content, 0, $start).substr($content, $end + 1));
 
         return new FeedbackChatResult(
             reply: $visibleReply !== '' ? $visibleReply : 'Thank you! Creating your issue now...',

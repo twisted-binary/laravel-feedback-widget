@@ -149,6 +149,27 @@ it('provides a default reply when sentinel is found but visible text is empty', 
         ->structuredData->not->toBeNull();
 });
 
+it('correctly parses sentinel JSON when response contains multibyte characters', function (): void {
+    $content = "Merci pour votre retour ! J'ai bien noté le problème."
+        ."\n"
+        .'{"__done__": true, "title": "[Bug] Impossible de sauvegarder une description", "body": "## Steps to Reproduce\n1. Accéder à une localisation d\'entreprise.\n2. Entrer une description.\n\n## Actual Behavior\nLa description reste vide après la sauvegarde.\n\n## Expected Behavior\nLa description devrait être visible immédiatement après avoir cliqué sur \'sauvegarder\'."}';
+
+    OpenAI::fake([
+        CreateResponse::fake([
+            'choices' => [
+                ['message' => ['role' => 'assistant', 'content' => $content]],
+            ],
+        ]),
+    ]);
+
+    $result = $this->service->chat('Oui, c\'est correct', [], 'bug');
+
+    expect($result)
+        ->isComplete->toBeTrue()
+        ->reply->toBe("Merci pour votre retour ! J'ai bien noté le problème.")
+        ->structuredData->title->toBe('[Bug] Impossible de sauvegarder une description');
+});
+
 it('does not prepend locale instruction for English locale', function (): void {
     $service = new FeedbackChatService(model: 'gpt-4o-mini', appName: 'TestApp', locale: 'en');
     $method = new ReflectionMethod($service, 'buildSystemPrompt');
