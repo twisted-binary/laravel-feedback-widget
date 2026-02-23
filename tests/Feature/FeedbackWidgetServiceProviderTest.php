@@ -58,7 +58,7 @@ it('uses the configured route prefix', function (): void {
 it('merges default config values', function (): void {
     expect(config('feedback-widget.route_prefix'))->toBe('feedback')
         ->and(config('feedback-widget.openai_model'))->toBe('gpt-4o-mini')
-        ->and(config('feedback-widget.throttle.chat'))->toBe('30,1')
+        ->and(config('feedback-widget.throttle.chat'))->toBe('10,1')
         ->and(config('feedback-widget.throttle.issue'))->toBe('5,1')
         ->and(config('feedback-widget.screenshot_disk'))->toBe('public')
         ->and(config('feedback-widget.screenshot_path'))->toBe('feedback-screenshots')

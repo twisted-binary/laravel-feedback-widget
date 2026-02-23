@@ -28,6 +28,7 @@ interface FeedbackWidgetProps {
         routes: {
             chat: string;
             issue: string;
+            csrf: string;
         };
     };
     [key: string]: unknown;
@@ -48,7 +49,7 @@ const isOpen = ref(false);
 const feedbackType = ref<'bug' | 'feature' | 'feedback'>('bug');
 const translations = ref<FeedbackTranslations>({ ...defaultTranslations });
 
-function getRoutes(): { chat: string; issue: string } {
+function getRoutes(): { chat: string; issue: string; csrf: string } {
     const page = usePage<FeedbackWidgetProps>();
     return page.props.feedbackWidget.routes;
 }
@@ -89,14 +90,12 @@ export function useFeedbackChat(options?: { translations?: Partial<FeedbackTrans
         try {
             const routes = getRoutes();
 
-            const response = await fetch(routes.chat, {
+            const response = await csrfFetch(routes.chat, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                     Accept: 'application/json',
-                    'X-XSRF-TOKEN': getCsrfToken(),
                 },
-                credentials: 'same-origin',
                 body: JSON.stringify({
                     message,
                     history: messages.value.slice(0, -1),
@@ -159,7 +158,6 @@ export function useFeedbackChat(options?: { translations?: Partial<FeedbackTrans
 
             const headers: Record<string, string> = {
                 Accept: 'application/json',
-                'X-XSRF-TOKEN': getCsrfToken(),
             };
 
             let body: FormData | string;
@@ -180,10 +178,9 @@ export function useFeedbackChat(options?: { translations?: Partial<FeedbackTrans
                 });
             }
 
-            const response = await fetch(routes.issue, {
+            const response = await csrfFetch(routes.issue, {
                 method: 'POST',
                 headers,
-                credentials: 'same-origin',
                 body,
             });
 
@@ -254,4 +251,32 @@ export function useFeedbackChat(options?: { translations?: Partial<FeedbackTrans
 function getCsrfToken(): string {
     const match = document.cookie.match(/XSRF-TOKEN=([^;]+)/);
     return match?.[1] ? decodeURIComponent(match[1]) : '';
+}
+
+async function refreshCsrfToken(): Promise<boolean> {
+    try {
+        const routes = getRoutes();
+        await fetch(routes.csrf, { credentials: 'same-origin' });
+        return true;
+    } catch {
+        return false;
+    }
+}
+
+async function csrfFetch(url: string, init: RequestInit): Promise<Response> {
+    const doFetch = () => {
+        const headers: Record<string, string> = {
+            ...(init.headers as Record<string, string>),
+            'X-XSRF-TOKEN': getCsrfToken(),
+        };
+        return fetch(url, { ...init, headers, credentials: 'same-origin' });
+    };
+
+    const response = await doFetch();
+
+    if (response.status === 419 && (await refreshCsrfToken())) {
+        return doFetch();
+    }
+
+    return response;
 }

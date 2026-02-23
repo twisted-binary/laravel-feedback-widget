@@ -44,6 +44,11 @@ final class FeedbackWidgetServiceProvider extends ServiceProvider
         Route::middleware(config('feedback-widget.middleware', ['web', 'auth', 'verified']))
             ->prefix(config('feedback-widget.route_prefix', 'feedback'))
             ->group(__DIR__.'/routes.php');
+
+        Route::middleware('web')
+            ->prefix(config('feedback-widget.route_prefix', 'feedback'))
+            ->get('csrf', fn () => response()->noContent())
+            ->name('feedback.csrf');
     }
 
     private function shareInertiaProps(): void
@@ -52,6 +57,7 @@ final class FeedbackWidgetServiceProvider extends ServiceProvider
             'routes' => [
                 'chat' => route('feedback.chat'),
                 'issue' => route('feedback.issue'),
+                'csrf' => route('feedback.csrf'),
             ],
         ]);
     }
