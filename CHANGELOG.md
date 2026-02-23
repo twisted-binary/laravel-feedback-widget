@@ -6,6 +6,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+## [1.3.1] - 2026-02-23
+
+### Fixed
+- Fixed JSON extraction failing on AI responses containing multibyte characters (e.g. French accented characters), which caused raw JSON to be displayed in the chat instead of creating the GitHub issue
+
 ## [1.3.0] - 2026-02-21
 
 ### Changed
