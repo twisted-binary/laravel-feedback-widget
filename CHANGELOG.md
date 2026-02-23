@@ -6,6 +6,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+## [1.3.2] - 2026-02-23
+
+### Fixed
+- Chat no longer shows "Session expired" when the page has been open for a long time — the CSRF token is now automatically refreshed and the request retried, preserving the user's typed message
+- Fixed test assertion for chat throttle config default (30 → 10 requests per minute)
+
 ## [1.3.1] - 2026-02-23
 
 ### Fixed
