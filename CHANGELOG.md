@@ -6,6 +6,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+## [1.4.0] - 2026-03-15
+
+### Added
+- AI cost tracking — per-request token usage logged to `feedback_ai_costs` table with conversation-level grouping
+- `FeedbackAiCost` Eloquent model with `forConversation` and `forUser` query scopes
+- `conversation_id` (UUID) sent from frontend to group all chat requests in a session
+- `track_ai_costs` config option (`FEEDBACK_WIDGET_TRACK_AI_COSTS` env) to disable tracking
+- Publishable migration via `vendor:publish --tag=feedback-widget-migrations`
+
 ## [1.3.2] - 2026-02-23
 
 ### Fixed

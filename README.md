@@ -10,6 +10,7 @@ An AI-powered feedback widget for Laravel + Inertia + Vue apps. Users describe b
 - **Star ratings** — Optional 5-star rating for general feedback
 - **GitHub App auth** — Uses GitHub App installation tokens (not PATs) for secure issue creation
 - **Zero config UI** — Drop `<FeedbackWidget />` into any layout; routes, bindings, and Inertia props are handled by the service provider
+- **AI cost tracking** — Per-request token usage logged to a `feedback_ai_costs` table with conversation-level grouping
 
 ## Requirements
 
@@ -53,6 +54,17 @@ php artisan vendor:publish --tag=feedback-widget-config
 ```
 
 This publishes `config/feedback-widget.php` where you can customize routes, middleware, throttling, and more.
+
+### 4. Publish and run migrations (optional)
+
+AI cost tracking is enabled by default. To create the `feedback_ai_costs` table:
+
+```bash
+php artisan vendor:publish --tag=feedback-widget-migrations
+php artisan migrate
+```
+
+To disable cost tracking entirely, set `FEEDBACK_WIDGET_TRACK_AI_COSTS=false` in your `.env`.
 
 ## OpenAI API Setup
 
@@ -142,6 +154,7 @@ GITHUB_FEEDBACK_LABEL=user-feedback   # optional
 FEEDBACK_WIDGET_APP_NAME=MyApp        # optional, used in AI prompts
 FEEDBACK_WIDGET_ROUTE_PREFIX=feedback  # optional
 FEEDBACK_WIDGET_LOCALE=en             # optional, defaults to app()->getLocale()
+FEEDBACK_WIDGET_TRACK_AI_COSTS=true   # optional, defaults to true
 ```
 
 ## Usage
@@ -191,6 +204,7 @@ return [
     'screenshot_path' => 'feedback-screenshots',
     'app_name' => env('FEEDBACK_WIDGET_APP_NAME', env('APP_NAME', 'the application')),
     'locale' => env('FEEDBACK_WIDGET_LOCALE', null), // null = app()->getLocale()
+    'track_ai_costs' => env('FEEDBACK_WIDGET_TRACK_AI_COSTS', true),
 ];
 ```
 
@@ -248,6 +262,27 @@ import type { FeedbackTranslations } from '@twisted-binary/feedback-widget';
 | `useFeedbackChat` | Composable with all state and methods |
 | `defaultTranslations` | Default English translations object |
 | `FeedbackTranslations` | TypeScript interface for all translatable strings |
+
+## AI Cost Tracking
+
+Every chat request logs token usage (prompt tokens, completion tokens, model) to the `feedback_ai_costs` table. Each conversation is grouped by a UUID `conversation_id` so you can aggregate usage per feedback session.
+
+Query examples:
+
+```php
+use TwistedBinary\FeedbackWidget\Models\FeedbackAiCost;
+
+// Total tokens for a conversation
+FeedbackAiCost::forConversation($id)->sum('total_tokens');
+
+// All costs for a user
+FeedbackAiCost::forUser($userId)->get();
+
+// Daily token usage
+FeedbackAiCost::whereDate('created_at', today())->sum('total_tokens');
+```
+
+To disable, set `track_ai_costs` to `false` in your config or `.env`. No rows will be inserted and the migration is still publishable but optional.
 
 ## How It Works
 

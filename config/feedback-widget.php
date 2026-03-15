@@ -22,4 +22,5 @@ return [
     'screenshot_path' => 'feedback-screenshots',
     'app_name' => env('FEEDBACK_WIDGET_APP_NAME', env('APP_NAME', 'the application')),
     'locale' => env('FEEDBACK_WIDGET_LOCALE', null),
+    'track_ai_costs' => env('FEEDBACK_WIDGET_TRACK_AI_COSTS', true),
 ];

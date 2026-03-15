@@ -43,7 +43,16 @@ final readonly class FeedbackChatService implements FeedbackChatServiceInterface
 
             throw_if($content === '', RuntimeException::class, 'Empty response from OpenAI.');
 
-            return $this->parseResponse($content);
+            $result = $this->parseResponse($content);
+
+            return new FeedbackChatResult(
+                reply: $result->reply,
+                isComplete: $result->isComplete,
+                structuredData: $result->structuredData,
+                promptTokens: $response->usage?->promptTokens ?? null,
+                completionTokens: $response->usage?->completionTokens ?? null,
+                model: $response->model ?? $this->model,
+            );
         } catch (Throwable $throwable) {
             throw new RuntimeException('Feedback chat failed: '.$throwable->getMessage(), $throwable->getCode(), $throwable);
         }

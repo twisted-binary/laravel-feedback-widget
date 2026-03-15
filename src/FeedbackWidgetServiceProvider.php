@@ -35,6 +35,10 @@ final class FeedbackWidgetServiceProvider extends ServiceProvider
             __DIR__.'/../config/feedback-widget.php' => config_path('feedback-widget.php'),
         ], 'feedback-widget-config');
 
+        $this->publishesMigrations([
+            __DIR__.'/../database/migrations' => database_path('migrations'),
+        ], 'feedback-widget-migrations');
+
         $this->registerRoutes();
         $this->shareInertiaProps();
     }

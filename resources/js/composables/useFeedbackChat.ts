@@ -36,6 +36,7 @@ interface FeedbackWidgetProps {
 
 const MAX_MESSAGES = 40;
 
+const conversationId = ref<string | null>(null);
 const messages = ref<ChatMessage[]>([]);
 const isLoading = ref(false);
 const isComplete = ref(false);
@@ -78,6 +79,10 @@ export function useFeedbackChat(options?: { translations?: Partial<FeedbackTrans
     async function sendMessage(message: string, type: string): Promise<void> {
         error.value = null;
 
+        if (!conversationId.value) {
+            conversationId.value = crypto.randomUUID();
+        }
+
         if (messages.value.length >= MAX_MESSAGES) {
             error.value = translations.value.maxMessagesError;
             return;
@@ -100,6 +105,7 @@ export function useFeedbackChat(options?: { translations?: Partial<FeedbackTrans
                     message,
                     history: messages.value.slice(0, -1),
                     type,
+                    conversation_id: conversationId.value,
                 }),
             });
 
@@ -212,6 +218,7 @@ export function useFeedbackChat(options?: { translations?: Partial<FeedbackTrans
     }
 
     function reset(): void {
+        conversationId.value = null;
         messages.value = [];
         isLoading.value = false;
         isComplete.value = false;

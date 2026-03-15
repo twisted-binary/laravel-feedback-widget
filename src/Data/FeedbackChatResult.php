@@ -13,5 +13,8 @@ final readonly class FeedbackChatResult
         public string $reply,
         public bool $isComplete,
         public ?array $structuredData = null,
+        public ?int $promptTokens = null,
+        public ?int $completionTokens = null,
+        public ?string $model = null,
     ) {}
 }

@@ -32,6 +32,7 @@ final class FeedbackChatRequest extends FormRequest
             'history.*.role' => ['required_with:history', 'string', Rule::in(['user', 'assistant'])],
             'history.*.content' => ['required_with:history', 'string', 'max:5000'],
             'type' => ['required', 'string', Rule::in(['bug', 'feature', 'feedback'])],
+            'conversation_id' => ['nullable', 'string', 'uuid'],
         ];
     }
 
