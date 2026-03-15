@@ -6,6 +6,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+## [1.4.1] - 2026-03-15
+
+### Changed
+- Migrations now auto-load via `loadMigrationsFrom()` instead of requiring `vendor:publish` — no publish step needed
+
 ## [1.4.0] - 2026-03-15
 
 ### Added
