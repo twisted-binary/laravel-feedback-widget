@@ -2,18 +2,18 @@
     "$schema": "https://getcomposer.org/schema.json",
     "name": "twisted-binary/laravel-feedback-widget",
     "description": "AI-powered feedback widget for Laravel + Inertia + Vue apps that creates GitHub issues.",
-    "version": "1.4.1",
+    "version": "1.5.0",
     "type": "library",
     "license": "MIT",
     "require": {
         "php": "^8.4",
-        "laravel/framework": "^12.0",
+        "laravel/framework": "^12.0|^13.0",
         "openai-php/laravel": ">=0.10 <1.0",
         "lcobucci/jwt": "^5.0",
-        "inertiajs/inertia-laravel": "^2.0"
+        "inertiajs/inertia-laravel": "^2.0|^3.0"
     },
     "require-dev": {
-        "orchestra/testbench": "^10.0",
+        "orchestra/testbench": "^10.0|^11.0",
         "pestphp/pest": "^4.0",
         "pestphp/pest-plugin-laravel": "^4.0"
     },
