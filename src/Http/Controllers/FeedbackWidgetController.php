@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Storage;
 use Throwable;
 use TwistedBinary\FeedbackWidget\Contracts\FeedbackChatServiceInterface;
 use TwistedBinary\FeedbackWidget\Contracts\IssueServiceInterface;
+use TwistedBinary\FeedbackWidget\Events\FeedbackAiCostRecorded;
 use TwistedBinary\FeedbackWidget\Models\FeedbackAiCost;
 use TwistedBinary\FeedbackWidget\Http\Requests\CreateFeedbackIssueRequest;
 use TwistedBinary\FeedbackWidget\Http\Requests\FeedbackChatRequest;
@@ -27,7 +28,7 @@ final class FeedbackWidgetController
 
             if (config('feedback-widget.track_ai_costs', true) && $result->promptTokens !== null) {
                 try {
-                    FeedbackAiCost::create([
+                    $cost = FeedbackAiCost::create([
                         'conversation_id' => $request->validated('conversation_id'),
                         'user_id' => $request->user()?->id,
                         'model' => $result->model ?? '',
@@ -36,6 +37,16 @@ final class FeedbackWidgetController
                         'total_tokens' => ($result->promptTokens) + ($result->completionTokens ?? 0),
                         'feedback_type' => $request->validated('type'),
                     ]);
+
+                    event(new FeedbackAiCostRecorded(
+                        userId: $cost->user_id,
+                        model: $cost->model,
+                        promptTokens: $cost->prompt_tokens,
+                        completionTokens: $cost->completion_tokens,
+                        feedbackType: $cost->feedback_type,
+                        conversationId: $cost->conversation_id ?? '',
+                        createdAt: $cost->created_at,
+                    ));
                 } catch (Throwable $costError) {
                     Log::warning('Failed to track AI cost', ['error' => $costError->getMessage()]);
                 }

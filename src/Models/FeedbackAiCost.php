@@ -16,7 +16,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property int $completion_tokens
  * @property int $total_tokens
  * @property string $feedback_type
- * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Carbon\CarbonImmutable|null $created_at
  */
 class FeedbackAiCost extends Model
 {
@@ -26,6 +26,7 @@ class FeedbackAiCost extends Model
         'prompt_tokens' => 'integer',
         'completion_tokens' => 'integer',
         'total_tokens' => 'integer',
+        'created_at' => 'immutable_datetime',
     ];
 
     protected $fillable = [

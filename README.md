@@ -284,6 +284,34 @@ FeedbackAiCost::whereDate('created_at', today())->sum('total_tokens');
 
 To disable, set `track_ai_costs` to `false` in your config or `.env`. No rows will be inserted and the migration is still publishable but optional.
 
+## Events
+
+The package dispatches a `FeedbackAiCostRecorded` event after each AI chat request, allowing your application to react to AI usage (e.g. external billing, analytics, alerting).
+
+### Event properties
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `userId` | `?int` | Authenticated user ID, or `null` if guest |
+| `model` | `string` | AI model used (e.g. `gpt-4o-mini`) |
+| `promptTokens` | `int` | Input tokens consumed |
+| `completionTokens` | `int` | Output tokens consumed |
+| `feedbackType` | `string` | Feedback type (`bug`, `feature`, `feedback`) |
+| `conversationId` | `string` | UUID grouping messages in the same session |
+| `createdAt` | `Carbon` | Timestamp of the recorded cost |
+
+### Listening for the event
+
+```php
+use TwistedBinary\FeedbackWidget\Events\FeedbackAiCostRecorded;
+
+Event::listen(FeedbackAiCostRecorded::class, function (FeedbackAiCostRecorded $event) {
+    // Report to an external service, log, etc.
+});
+```
+
+The event is dispatched synchronously. If you need async processing, dispatch a queued job from your listener.
+
 ## How It Works
 
 1. User clicks the floating action button
