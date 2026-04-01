@@ -6,6 +6,17 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+## [1.6.0] - 2026-04-01
+
+### Added
+- `FeedbackAiCostRecorded` event dispatched after each AI cost record, enabling billing, analytics, and alerting integrations
+- `immutable_datetime` cast on `FeedbackAiCost::created_at` for safe timestamp handling
+
+## [1.5.0] - 2026-03-28
+
+### Changed
+- Widened version constraints to support Laravel 13 and Inertia v3
+
 ## [1.4.1] - 2026-03-15
 
 ### Changed
