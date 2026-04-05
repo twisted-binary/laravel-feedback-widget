@@ -6,6 +6,18 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+## [1.7.0] - 2026-04-05
+
+### Added
+- Dark mode support via `prefers-color-scheme: dark` — all CSS custom properties automatically flip to a zinc-based dark palette
+- Mobile responsive layout — panel goes full-screen on viewports ≤ 480px
+- PHP 8.5 added to CI test matrix
+
+### Changed
+- Bumped `typescript` to ^6.0, `vitest` to ^4.1, `happy-dom` to ^20.0, `@vue/tsconfig` to ^0.9
+- Bumped `openai-php/laravel` to 0.19.1, `orchestra/testbench` to 11.0, `pestphp/pest` to 4.4.5
+- Error state now uses CSS custom properties (`--tbfw-error-*`) instead of hardcoded colors
+
 ## [1.6.0] - 2026-04-01
 
 ### Added

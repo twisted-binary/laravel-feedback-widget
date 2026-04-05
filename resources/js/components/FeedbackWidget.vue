@@ -50,6 +50,26 @@ const { isOpen, translations } = useFeedbackChat({ translations: props.translati
     --tbfw-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
 }
 
+@media (prefers-color-scheme: dark) {
+    .tbfw-widget {
+        --tbfw-primary: #fafafa;
+        --tbfw-primary-fg: #18181b;
+        --tbfw-bg: #18181b;
+        --tbfw-fg: #fafafa;
+        --tbfw-muted: #27272a;
+        --tbfw-muted-fg: #a1a1aa;
+        --tbfw-border: #3f3f46;
+        --tbfw-input: #3f3f46;
+        --tbfw-ring: #d4d4d8;
+        --tbfw-accent: #27272a;
+        --tbfw-accent-fg: #fafafa;
+        --tbfw-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.3), 0 4px 6px -4px rgb(0 0 0 / 0.3);
+        --tbfw-error-border: #991b1b;
+        --tbfw-error-bg: #450a0a;
+        --tbfw-error-fg: #fca5a5;
+    }
+}
+
 .tbfw-anchor {
     position: fixed;
     right: 1.5rem;
@@ -59,6 +79,20 @@ const { isOpen, translations } = useFeedbackChat({ translations: props.translati
 
 .tbfw-panel-wrapper {
     margin-bottom: 0.75rem;
+}
+
+@media (max-width: 480px) {
+    .tbfw-anchor {
+        right: 0.75rem;
+        bottom: 0.75rem;
+    }
+
+    .tbfw-panel-wrapper {
+        position: fixed;
+        inset: 0.5rem;
+        bottom: 4.5rem;
+        margin-bottom: 0;
+    }
 }
 
 .tbfw-fab {
@@ -72,7 +106,9 @@ const { isOpen, translations } = useFeedbackChat({ translations: props.translati
     cursor: pointer;
     background-color: var(--tbfw-primary);
     color: var(--tbfw-primary-fg);
-    box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+    box-shadow:
+        0 10px 15px -3px rgb(0 0 0 / 0.1),
+        0 4px 6px -4px rgb(0 0 0 / 0.1);
     transition: transform 0.15s ease;
 }
 

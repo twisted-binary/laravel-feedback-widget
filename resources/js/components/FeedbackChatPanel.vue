@@ -187,21 +187,11 @@ watch(
 </script>
 
 <template>
-    <div
-        ref="panelRef"
-        role="dialog"
-        aria-modal="true"
-        class="tbfw-panel"
-        @keydown="handlePanelKeydown"
-    >
+    <div ref="panelRef" role="dialog" aria-modal="true" class="tbfw-panel" @keydown="handlePanelKeydown">
         <!-- Header -->
         <div class="tbfw-header">
             <h3 class="tbfw-header-title">{{ translations.header }}</h3>
-            <button
-                :aria-label="translations.closeFeedback"
-                class="tbfw-icon-btn"
-                @click="emit('close')"
-            >
+            <button :aria-label="translations.closeFeedback" class="tbfw-icon-btn" @click="emit('close')">
                 <X class="tbfw-icon-sm" />
             </button>
         </div>
@@ -242,7 +232,10 @@ watch(
                         @mouseleave="starHover = 0"
                     >
                         <Star
-                            :class="['tbfw-star-icon', star <= (starHover || starRating) ? 'tbfw-star--filled' : 'tbfw-star--empty']"
+                            :class="[
+                                'tbfw-star-icon',
+                                star <= (starHover || starRating) ? 'tbfw-star--filled' : 'tbfw-star--empty',
+                            ]"
                         />
                     </button>
                 </div>
@@ -254,9 +247,7 @@ watch(
                 :key="index"
                 :class="['tbfw-msg-row', msg.role === 'user' ? 'tbfw-msg-row--end' : 'tbfw-msg-row--start']"
             >
-                <div
-                    :class="['tbfw-bubble', msg.role === 'user' ? 'tbfw-bubble--user' : 'tbfw-bubble--assistant']"
-                >
+                <div :class="['tbfw-bubble', msg.role === 'user' ? 'tbfw-bubble--user' : 'tbfw-bubble--assistant']">
                     <p class="tbfw-bubble-text">{{ msg.content }}</p>
                 </div>
             </div>
@@ -293,11 +284,7 @@ watch(
         <div v-else class="tbfw-input-area">
             <!-- Screenshot preview -->
             <div v-if="screenshotPreview" class="tbfw-screenshot-preview">
-                <img
-                    :src="screenshotPreview"
-                    :alt="translations.screenshotPreview"
-                    class="tbfw-screenshot-img"
-                />
+                <img :src="screenshotPreview" :alt="translations.screenshotPreview" class="tbfw-screenshot-img" />
                 <button class="tbfw-screenshot-remove" @click="clearScreenshot">
                     <X class="tbfw-icon-xs" />
                 </button>
@@ -350,9 +337,19 @@ watch(
     background-color: var(--tbfw-bg);
     color: var(--tbfw-fg);
     box-shadow: var(--tbfw-shadow);
-    font-family: system-ui, -apple-system, sans-serif;
+    font-family:
+        system-ui,
+        -apple-system,
+        sans-serif;
     font-size: 0.875rem;
     line-height: 1.5;
+}
+
+@media (max-width: 480px) {
+    .tbfw-panel {
+        width: 100%;
+        height: 100%;
+    }
 }
 
 /* ─── Header ─── */
@@ -388,7 +385,9 @@ watch(
     cursor: pointer;
     font-size: 0.75rem;
     font-weight: 500;
-    transition: background-color 0.15s, color 0.15s;
+    transition:
+        background-color 0.15s,
+        color 0.15s;
     color: var(--tbfw-muted-fg);
     background: transparent;
 }
@@ -554,19 +553,11 @@ watch(
 /* ─── Error ─── */
 .tbfw-error {
     border-radius: 0.5rem;
-    border: 1px solid #fecaca;
-    background-color: #fef2f2;
+    border: 1px solid var(--tbfw-error-border, #fecaca);
+    background-color: var(--tbfw-error-bg, #fef2f2);
     padding: 0.5rem 0.75rem;
     font-size: 0.75rem;
-    color: #b91c1c;
-}
-
-@media (prefers-color-scheme: dark) {
-    .tbfw-error {
-        border-color: #991b1b;
-        background-color: #450a0a;
-        color: #fca5a5;
-    }
+    color: var(--tbfw-error-fg, #b91c1c);
 }
 
 /* ─── Success State ─── */
@@ -611,7 +602,9 @@ watch(
     font-size: 0.875rem;
     font-weight: 500;
     cursor: pointer;
-    transition: background-color 0.15s, color 0.15s;
+    transition:
+        background-color 0.15s,
+        color 0.15s;
 }
 
 .tbfw-btn-outline:hover {
@@ -631,7 +624,9 @@ watch(
     font-size: 0.875rem;
     font-weight: 500;
     cursor: pointer;
-    transition: background-color 0.15s, color 0.15s;
+    transition:
+        background-color 0.15s,
+        color 0.15s;
 }
 
 .tbfw-btn-ghost:hover {
@@ -650,7 +645,9 @@ watch(
     background: transparent;
     color: var(--tbfw-muted-fg);
     cursor: pointer;
-    transition: background-color 0.15s, color 0.15s;
+    transition:
+        background-color 0.15s,
+        color 0.15s;
 }
 
 .tbfw-icon-btn:hover {
@@ -684,7 +681,9 @@ watch(
     font-family: inherit;
     line-height: 1.5;
     outline: none;
-    transition: border-color 0.15s, box-shadow 0.15s;
+    transition:
+        border-color 0.15s,
+        box-shadow 0.15s;
 }
 
 .tbfw-textarea::placeholder {
