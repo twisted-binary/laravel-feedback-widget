@@ -6,6 +6,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+## [1.7.1] - 2026-06-26
+
+### Changed
+- Bumped dev dependencies: `@vue/test-utils` to ^2.4.11, `happy-dom` to ^20.10.6, `prettier` to ^3.8.4, `typescript` to ^6.0.3, `vitest` to ^4.1.9, `vue-tsc` to ^3.3.5
+- Added `allowScripts` entry for `fsevents@2.3.3`
+
 ## [1.7.0] - 2026-04-05
 
 ### Added
